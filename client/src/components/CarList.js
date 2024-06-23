@@ -5,6 +5,7 @@ import ExpandablePanel from './ExpandablePanel';
 
 const CarList = () => {
 	const { data, error, isFetching } = useFetchCarQuery();
+	console.log(`data is ${data}`);
 	let content;
 	if (isFetching) {
 		content = <Skeleton times={3} />;
