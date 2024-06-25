@@ -1,19 +1,25 @@
-import { createSelector, createEntityAdapter } from '@reduxjs/toolkit';
-import { carApi } from '../store/apis/carApi';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {
+	setAllCars,
+	addCar,
+	updateCar,
+	removeCar,
+} from '../../slices/carSlice';
+import { store } from '../../store';
 
-const carAdapter = createEntityAdapter({
-	selectId: (car) => car._id, // Use _id as the unique identifier,
-});
-
-const initialState = carAdapter.getInitialState();
-
-export const extendedApiSlice = carApi.injectEndpoints({
+const carApi = createApi({
+	reducerPath: 'carApi',
+	baseQuery: fetchBaseQuery({
+		baseUrl: 'http://localhost:3000',
+	}),
+	tagTypes: ['Car'],
 	endpoints: (builder) => ({
 		fetchCar: builder.query({
 			query: () => '/car/fetch',
-			// transformResponse: (response) => {
-			// 	return carAdapter.setAll(initialState, response);
-			// },
+			transformResponse: (response) => {
+				store.dispatch(setAllCars(response));
+				return response;
+			},
 			providesTags: (result) =>
 				result
 					? [
@@ -28,6 +34,14 @@ export const extendedApiSlice = carApi.injectEndpoints({
 				method: 'POST',
 				body: car,
 			}),
+			onQueryStarted: async (car, { dispatch, queryFulfilled }) => {
+				try {
+					const { data } = await queryFulfilled;
+					dispatch(addCar(data));
+				} catch (error) {
+					console.error('Add car failed', error);
+				}
+			},
 			invalidatesTags: [{ type: 'Car', id: 'LIST' }],
 		}),
 		removeCar: builder.mutation({
@@ -35,6 +49,14 @@ export const extendedApiSlice = carApi.injectEndpoints({
 				url: `/car/delete/${id}`,
 				method: 'DELETE',
 			}),
+			onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
+				try {
+					await queryFulfilled;
+					dispatch(removeCar(id));
+				} catch (error) {
+					console.error('Remove car failed', error);
+				}
+			},
 			invalidatesTags: (result, error, id) => [
 				{ type: 'Car', id },
 				{ type: 'Car', id: 'LIST' },
@@ -46,6 +68,17 @@ export const extendedApiSlice = carApi.injectEndpoints({
 				method: 'PUT',
 				body: formDataObject,
 			}),
+			onQueryStarted: async (
+				{ id, formDataObject },
+				{ dispatch, queryFulfilled }
+			) => {
+				try {
+					const { data } = await queryFulfilled;
+					dispatch(updateCar({ id, changes: data }));
+				} catch (error) {
+					console.error('Edit car failed', error);
+				}
+			},
 			invalidatesTags: [{ type: 'Car', id: 'LIST' }],
 		}),
 		fetchCarById: builder.query({
@@ -62,20 +95,6 @@ export const {
 	useRemoveCarMutation,
 	useEditCarMutation,
 	useFetchCarByIdQuery,
-} = extendedApiSlice;
+} = carApi;
 
-// returns the query result object (entire objects)
-export const selectCarResult = extendedApiSlice.endpoints.fetchCar.select();
-
-// creates memoized selector
-const selectCarData = createSelector(
-	selectCarResult,
-	(carResult) => carResult.data ?? initialState // normalized state object with ids & entities
-);
-
-export const {
-	selectAll: selectAllCars,
-	selectById: selectCarById,
-	selectIds: selectCarIds,
-	// Pass in a selector that returns the car slice of state
-} = carAdapter.getSelectors((state) => selectCarData(state));
+export { carApi };
