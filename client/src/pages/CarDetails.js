@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useRemoveCarMutation } from '../store';
 import Button from '../components/Button';
 
-function CarDetails({ data }) {
+function CarDetails({ cars }) {
 	const [removeCar] = useRemoveCarMutation();
 
 	const handleClick = async (id) => {
@@ -14,7 +14,7 @@ function CarDetails({ data }) {
 		}
 	};
 
-	const renderedCars = data.map((car) => {
+	const renderedCars = cars.map((car) => {
 		return (
 			<div
 				key={car._id}

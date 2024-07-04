@@ -1,12 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { carApi } from './apis/carApi';
 import { authApi } from './apis/authApi';
-import carReducer from '../slices/carSlice';
-import { setupListeners } from '@reduxjs/toolkit/query';
+// import { setupListeners } from '@reduxjs/toolkit/query';
 
 export const store = configureStore({
 	reducer: {
-		car: carReducer,
 		[authApi.reducerPath]: authApi.reducer,
 		[carApi.reducerPath]: carApi.reducer,
 	},
@@ -15,13 +13,12 @@ export const store = configureStore({
 	},
 });
 
-setupListeners(store.dispatch);
-
+// setupListeners(store.dispatch);
+export { useFetchUserQuery } from './apis/authApi';
 export {
 	useFetchCarQuery,
 	useAddCarMutation,
 	useRemoveCarMutation,
 	useEditCarMutation,
 	useFetchCarByIdQuery,
-} from './apis/carApi';
-export { useFetchUserQuery } from './apis/authApi';
+} from '../slices/carSlice';
