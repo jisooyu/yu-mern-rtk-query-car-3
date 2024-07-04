@@ -11,10 +11,11 @@ import { selectAllCars } from '../slices/carSlice';
 
 const Dashboard = () => {
 	const [searchTerm, setSearchTerm] = useState('');
-	const { data = {}, error, isFetching } = useFetchCarQuery();
+	const { error, isFetching } = useFetchCarQuery();
 	const navigate = useNavigate();
-	// useSelector is a hook provided by react-redux that allows you to extract data from the Redux store state.
-	// It is used to select a slice of the state managed by Redux and make it available to your React component.
+
+	/* useSelector is a hook provided by react-redux that allows you to extract data from the Redux store state.
+	It is used to select a slice of the state managed by Redux and make it available to your React component. */
 	const cars = useSelector(selectAllCars);
 
 	const handleSearchChange = (e) => {
