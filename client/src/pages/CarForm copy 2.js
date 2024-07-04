@@ -25,6 +25,7 @@ function CarForm() {
 		const files = e.target.files;
 		setFormData((prevFiles) => ({
 			...prevFiles,
+			//  if no files are selected, it might be better to initialize the imageFiles state as an empty array
 			imageFiles: [...(prevFiles.imageFiles || []), ...files],
 		}));
 	};
@@ -65,10 +66,9 @@ function CarForm() {
 			await addCar(formDataObject).unwrap();
 			navigate('/dashboard');
 		} catch (error) {
-			console.log(error.message);
+			console.log(error.message || addError.message);
 		}
 	};
-
 	return (
 		<div className='container mx-auto flex flex-col items-center'>
 			<h1 className='m-3'>자동차 정보 입력 양식</h1>
@@ -76,7 +76,6 @@ function CarForm() {
 				onSubmit={handleSubmit}
 				className='w-full max-w-lg'
 			>
-				{/* Form Fields */}
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -111,6 +110,7 @@ function CarForm() {
 						placeholder='Model Year'
 					/>
 				</div>
+
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -128,6 +128,9 @@ function CarForm() {
 						placeholder='Model Name'
 					/>
 				</div>
+
+				{/* Input for engines */}
+
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -145,6 +148,9 @@ function CarForm() {
 						placeholder='Engine Names'
 					/>
 				</div>
+
+				{/*  input for price range*/}
+
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						최저가격 ($)
@@ -173,6 +179,8 @@ function CarForm() {
 						placeholder='Upper Price'
 					/>
 				</div>
+
+				{/* input for mpg*/}
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						MPG
@@ -187,6 +195,8 @@ function CarForm() {
 						placeholder='miles per gallon'
 					/>
 				</div>
+
+				{/* input driving range*/}
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						EV Range
@@ -201,6 +211,8 @@ function CarForm() {
 						placeholder='miles per charge'
 					/>
 				</div>
+				{/* Input for options */}
+
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						옵션
@@ -216,6 +228,7 @@ function CarForm() {
 						placeholder='Option Names (comma-separated)'
 					/>
 				</div>
+
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -238,9 +251,8 @@ function CarForm() {
 						className='bg-blue-500 hover:bg-blue-700 text-white'
 						rounded
 						primary
-						disabled={isAdding}
 					>
-						{isAdding ? 'Submitting...' : 'Submit'}
+						Submit
 					</Button>
 					<Button
 						type='button'
@@ -252,9 +264,6 @@ function CarForm() {
 						Cancel
 					</Button>
 				</div>
-				{addError && (
-					<p className='text-red-500 mt-2'>Error: {addError.message}</p>
-				)}
 			</form>
 		</div>
 	);

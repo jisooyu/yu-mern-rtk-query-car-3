@@ -5,23 +5,24 @@ import { useAddCarMutation } from '../store';
 
 function CarForm() {
 	const navigate = useNavigate();
+
 	const [addCar, { isLoading: isAdding, error: addError }] =
 		useAddCarMutation();
 
 	const [formData, setFormData] = useState({
 		carMakerName: '',
-		modelYear: '',
+		modelYear: 0,
 		modelName: '',
 		engine: '',
-		minPrice: '',
-		maxPrice: '',
-		mpg: '',
-		range: '',
+		minPrice: 0,
+		maxPrice: 0,
+		mpg: 0,
+		range: 0,
 		options: [],
 		imageFiles: [],
 	});
 
-	const handleImage = (e) => {
+	const handleImage = async (e) => {
 		const files = e.target.files;
 		setFormData((prevFiles) => ({
 			...prevFiles,
@@ -36,39 +37,35 @@ function CarForm() {
 
 	const handleArrayChange = (e) => {
 		const { name, value } = e.target;
-		setFormData({
-			...formData,
-			[name]: value.split(',').map((opt) => opt.trim()),
-		});
+		setFormData({ ...formData, [name]: value.split(',') });
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const formDataObject = new FormData();
 		formDataObject.append('carMakerName', formData.carMakerName);
-		formDataObject.append('modelYear', Number(formData.modelYear));
+		formDataObject.append('modelYear', formData.modelYear);
 		formDataObject.append('modelName', formData.modelName);
 		formDataObject.append('engine', formData.engine);
-		formDataObject.append('maxPrice', Number(formData.maxPrice));
-		formDataObject.append('minPrice', Number(formData.minPrice));
-		formDataObject.append('mpg', Number(formData.mpg));
-		formDataObject.append('range', Number(formData.range));
+		formDataObject.append('maxPrice', formData.maxPrice);
+		formDataObject.append('minPrice', formData.minPrice);
+		formDataObject.append('mpg', formData.mpg);
+		formDataObject.append('range', formData.range);
 		formDataObject.append('options', formData.options.join(','));
 
-		if (formData.imageFiles.length) {
+		// Check if an image file is selected before appending it to FormData
+		if (formData.imageFiles) {
 			for (let i = 0; i < formData.imageFiles.length; i++) {
 				formDataObject.append('imageFiles', formData.imageFiles[i]);
 			}
 		}
-
 		try {
 			await addCar(formDataObject).unwrap();
 			navigate('/dashboard');
 		} catch (error) {
-			console.log(error.message);
+			console.log(error, addError.message);
 		}
 	};
-
 	return (
 		<div className='container mx-auto flex flex-col items-center'>
 			<h1 className='m-3'>자동차 정보 입력 양식</h1>
@@ -76,7 +73,6 @@ function CarForm() {
 				onSubmit={handleSubmit}
 				className='w-full max-w-lg'
 			>
-				{/* Form Fields */}
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -111,6 +107,7 @@ function CarForm() {
 						placeholder='Model Year'
 					/>
 				</div>
+
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -128,6 +125,9 @@ function CarForm() {
 						placeholder='Model Name'
 					/>
 				</div>
+
+				{/* Input for engines */}
+
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -145,6 +145,9 @@ function CarForm() {
 						placeholder='Engine Names'
 					/>
 				</div>
+
+				{/*  input for price range*/}
+
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						최저가격 ($)
@@ -173,6 +176,8 @@ function CarForm() {
 						placeholder='Upper Price'
 					/>
 				</div>
+
+				{/* input for mpg*/}
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						MPG
@@ -187,6 +192,8 @@ function CarForm() {
 						placeholder='miles per gallon'
 					/>
 				</div>
+
+				{/* input driving range*/}
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						EV Range
@@ -201,6 +208,8 @@ function CarForm() {
 						placeholder='miles per charge'
 					/>
 				</div>
+				{/* Input for options */}
+
 				<div className='mb-2'>
 					<label className='block text-gray-700 text-sm font-bold mb-2'>
 						옵션
@@ -216,6 +225,7 @@ function CarForm() {
 						placeholder='Option Names (comma-separated)'
 					/>
 				</div>
+
 				<div className='mb-2'>
 					<label
 						className='block text-gray-700 text-sm font-bold mb-2'
@@ -238,12 +248,11 @@ function CarForm() {
 						className='bg-blue-500 hover:bg-blue-700 text-white'
 						rounded
 						primary
-						disabled={isAdding}
 					>
-						{isAdding ? 'Submitting...' : 'Submit'}
+						Submit
 					</Button>
 					<Button
-						type='button'
+						type='submit'
 						className='bg-blue-500 hover:bg-blue-700 text-white ml-5'
 						rounded
 						danger
@@ -252,9 +261,6 @@ function CarForm() {
 						Cancel
 					</Button>
 				</div>
-				{addError && (
-					<p className='text-red-500 mt-2'>Error: {addError.message}</p>
-				)}
 			</form>
 		</div>
 	);

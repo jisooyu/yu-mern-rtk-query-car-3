@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const carApi = createApi({
+const carApi = createApi({
 	reducerPath: 'carApi',
 	baseQuery: fetchBaseQuery({
 		baseUrl: 'http://localhost:3000',
@@ -17,4 +17,4 @@ export const {
 	useFetchCarByIdQuery,
 } = carApi;
 
-// export { carApi };
+export { carApi };
