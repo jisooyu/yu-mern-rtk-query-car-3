@@ -12,8 +12,9 @@ export const store = configureStore({
 	},
 });
 
-// setupListeners(store.dispatch);
 export { useFetchUserQuery } from './apis/authApi';
+
+// hooks must be imported from carSlice
 export {
 	useFetchCarQuery,
 	useAddCarMutation,

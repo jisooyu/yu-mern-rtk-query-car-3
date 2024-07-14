@@ -4,18 +4,23 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import CarForm from './pages/CarForm';
 import CarEditForm from './pages/CarEditForm';
+import Skeleton from './components/Skeleton';
 
 function App() {
 	const { data: user, error, isLoading } = useFetchUserQuery();
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
 
-	if (error) {
-		return <div>Error: {error.message}</div>;
-	}
-	return (
-		<>
+	let content;
+	if (isLoading) {
+		content = (
+			<Skeleton
+				times={20}
+				className='h-10 w-full'
+			/>
+		);
+	} else if (error) {
+		content = <div>Error handling user</div>;
+	} else {
+		content = (
 			<Routes>
 				<Route
 					path='/'
@@ -40,8 +45,10 @@ function App() {
 					element={<CarEditForm />}
 				/>
 			</Routes>
-		</>
-	);
+		);
+	}
+
+	return <>{content}</>;
 }
 
 export default App;

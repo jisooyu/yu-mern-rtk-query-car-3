@@ -62,6 +62,8 @@ function CarForm() {
 		}
 
 		try {
+			/* If you don't use unwrap(), you have to manually check the fulfilled
+			and rejected states of the promise, which can be more verbose */
 			await addCar(formDataObject).unwrap();
 			navigate('/dashboard');
 		} catch (error) {

@@ -2,18 +2,20 @@
 import { createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 import { carApi } from '../store/apis/carApi';
 
+// to create a unique id and normalize the data
 const carAdapter = createEntityAdapter({
-	selectId: (car) => car._id, // Use _id as the unique identifier,
+	selectId: (car) => car._id, // Use _id as the unique identifier
 	sortComparer: (a, b) => a.modelName.localeCompare(b.modelName),
 });
 
 const initialState = carAdapter.getInitialState();
 
+// create the endpoints
 export const extendedApiSlice = carApi.injectEndpoints({
 	endpoints: (builder) => ({
 		fetchCar: builder.query({
 			query: () => '/car/fetch',
-			// to normalize the raw data from the backend server
+			// to modify the normalized data
 			transformResponse: (response) => {
 				try {
 					return carAdapter.setAll(initialState, response);
@@ -22,7 +24,7 @@ export const extendedApiSlice = carApi.injectEndpoints({
 					return initialState;
 				}
 			},
-			// to manage cacheing, note: the result is from transformResponse
+			// to manage caching, note: the result is from transformResponse
 			providesTags: (result, error, arg) => {
 				try {
 					const tags = [
@@ -83,13 +85,35 @@ export const {
 	useFetchCarByIdQuery,
 } = extendedApiSlice;
 
-// returns the query result object (entire objects)
+/*
+selectCarResult is a selector created using the fetchCar endpoint's select method. 
+This selector extracts the result of the fetchCar query from the Redux state.
+*/
 export const selectCarResult = extendedApiSlice.endpoints.fetchCar.select();
 
-// creates memoized selector
+/*
+ This selectCarData is in the normalized state format (with ids and entities).
+*/
 const selectCarData = createSelector(
-	selectCarResult,
-	(carResult) => carResult.data ?? initialState // normalized state object with ids & entities
+	selectCarResult, // input function
+	(carResult) => carResult?.data ?? initialState // output function: normalized state object with ids & entities
+);
+
+// New selector: Filter cars based on the search term
+export const selectFilteredCars = createSelector(
+	selectCarData,
+	(_, searchTerm) => searchTerm, // Pass the search term as an argument
+	(cars, searchTerm) => {
+		// Transform normalized data to an array
+		const carArray = cars.ids.map((id) => cars.entities[id]);
+		// Filter the array based on the search term
+		if (!searchTerm) {
+			return carArray;
+		}
+		return carArray.filter((car) =>
+			car.modelName.toLowerCase().includes(searchTerm.toLowerCase())
+		);
+	}
 );
 
 export const {
