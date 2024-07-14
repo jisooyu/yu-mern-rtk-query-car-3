@@ -2,7 +2,7 @@
 	"name": "client",
 	"version": "0.1.0",
 	"private": true,
-	"proxy": "http://localhost:5000",
+	"proxy": "https://yu-mern-rtk-query-car-3-hs084kb0p-jisooyus-projects.vercel.app/",
 	"dependencies": {
 		"@babel/plugin-proposal-private-property-in-object": "^7.21.11",
 		"@reduxjs/toolkit": "^1.9.7",
